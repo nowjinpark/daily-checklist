@@ -1,6 +1,6 @@
 # Daily Checklist
 
-A lightweight single-file checklist app built as a first vibe-coding project. It helps track day-by-day tasks in the browser with no backend and no account setup.
+A lightweight single-file checklist app built as my first vibe-coding project. It helps track day-by-day tasks in the browser with no backend and no account setup.
 
 ## Portfolio Summary
 
@@ -8,7 +8,7 @@ This project started as a simple personal productivity tool and grew into a rich
 
 Suggested GitHub repository description:
 
-> Single-file daily checklist app with date-based planning, recurring duration tasks, local backup, and browser-only storage.
+> Single-file vibe-coded daily checklist app with date-based planning, recurring duration tasks, local backup, and browser-only storage.
 
 ## Features
 

@@ -8,6 +8,7 @@ checklist-backup-*.json
 index_backup.html
 recovery.html
 test_debug.html
+gh-login*.txt
 
 # Local screenshots or captures
 *.png
