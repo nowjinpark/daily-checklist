@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: #2a2a2a;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #3d3d3d;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #333333;
+            color: #f0f0f0;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid #4a4a4a;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .date-selector {
+            background: #383838;
+            padding: 20px;
+            border-bottom: 2px solid #4a4a4a;
+        }
+
+        .date-selector label {
+            font-weight: 600;
+            margin-right: 10px;
+            color: #c8c8c8;
+        }
+
+        .date-selector input {
+            padding: 10px 15px;
+            border: 2px solid #5a5a5a;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+            background: #303030;
+            color: #f0f0f0;
+        }
+
+        .date-selector input:focus {
+            border-color: #777777;
+        }
+
+        .content {
+            padding: 30px;
+            background: #3d3d3d;
+        }
+
+        .category-section {
+            margin-bottom: 30px;
+        }
+
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .category-name {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #e5e5e5;
+            flex: 1;
+        }
+
+        .category-name input {
+            border: none;
+            background: transparent;
+            font-size: 1em;
+            font-weight: 600;
+            color: #e5e5e5;
+            padding: 5px;
+            width: 100%;
+            outline: none;
+        }
+
+        .category-name input:focus {
+            background: #4a4a4a;
+            border-radius: 5px;
+        }
+
+        .delete-category-btn {
+            background: #6a6a6a;
+            color: #f0f0f0;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .delete-category-btn:hover {
+            background: #808080;
+        }
+
+        .task-list {
+            background: #353535;
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 80px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #484848;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: grab;
+            position: relative;
+            border: 1px solid #5a5a5a;
+        }
+
+        .task-item:active {
+            cursor: grabbing;
+        }
+
+        .task-item.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        .task-item.drag-over {
+            border-top: 3px solid #999999;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            background: #555555;
+        }
+
+        .task-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .task-text {
+            font-size: 1.1em;
+            transition: all 0.3s;
+            word-break: break-word;
+            color: #f5f5f5;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            opacity: 0.5;
+            color: #999999;
+        }
+
+        .task-date-label {
+            font-size: 0.85em;
+            color: #a8a8a8;
+            font-style: italic;
+        }
+
+        .task-type-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-daily-independent {
+            background: #5a5a5a;
+            color: #d0d0d0;
+            border: 1px solid #707070;
+        }
+
+        .badge-daily-shared {
+            background: #4a4a4a;
+            color: #c0c0c0;
+            border: 1px solid #656565;
+        }
+
+        .badge-duration {
+            background: #3a3a3a;
+            color: #b0b0b0;
+            border: 1px solid #606060;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .color-picker {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #dee2e6;
+            border-radius: 50%;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .edit-task-btn, .delete-task-btn {
+            background: #5a5a5a;
+            color: #f0f0f0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: background 0.3s;
+        }
+
+        .edit-task-btn:hover {
+            background: #6a6a6a;
+        }
+
+        .delete-task-btn {
+            background: #4a4a4a;
+        }
+
+        .delete-task-btn:hover {
+            background: #5a5a5a;
+        }
+
+        .add-task-section {
+            margin-top: 15px;
+        }
+
+        .task-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #5a5a5a;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.3s;
+            margin-bottom: 10px;
+            background: #303030;
+            color: #f0f0f0;
+        }
+
+        .task-input:focus {
+            border-color: #777777;
+        }
+
+        .task-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .task-type-selector {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .task-type-selector label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #c8c8c8;
+        }
+
+        .task-type-selector select {
+            padding: 8px 12px;
+            border: 2px solid #5a5a5a;
+            border-radius: 6px;
+            font-size: 0.9em;
+            outline: none;
+            cursor: pointer;
+            background: #303030;
+            color: #f0f0f0;
+        }
+
+        .duration-inputs {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .duration-inputs label {
+            font-size: 0.85em;
+            color: #c8c8c8;
+            font-weight: 600;
+        }
+
+        .duration-inputs input {
+            padding: 8px;
+            border: 2px solid #5a5a5a;
+            border-radius: 6px;
+            font-size: 0.85em;
+            outline: none;
+            background: #303030;
+            color: #f0f0f0;
+        }
+
+        .duration-inputs select {
+            padding: 8px;
+            border: 2px solid #5a5a5a;
+            border-radius: 6px;
+            font-size: 0.85em;
+            outline: none;
+            background: #303030;
+            color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .add-task-btn {
+            background: #5a5a5a;
+            color: #f0f0f0;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        .add-task-btn:hover {
+            background: #6a6a6a;
+        }
+
+        .add-category-section {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #4a4a4a;
+        }
+
+        .add-category-btn {
+            background: #4a4a4a;
+            color: #f0f0f0;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        .add-category-btn:hover {
+            background: #5a5a5a;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #a0a0a0;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #3d3d3d;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid #5a5a5a;
+        }
+
+        .modal-header {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #e5e5e5;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #5a5a5a;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+            margin-bottom: 15px;
+            background: #303030;
+            color: #f0f0f0;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .modal-btn-save {
+            background: #5a5a5a;
+            color: #f0f0f0;
+        }
+
+        .modal-btn-save:hover {
+            background: #6a6a6a;
+        }
+
+        .modal-btn-cancel {
+            background: #4a4a4a;
+            color: #f0f0f0;
+        }
+
+        .modal-btn-cancel:hover {
+            background: #5a5a5a;
+        }
+
+        .task-detail-modal .modal-content {
+            max-width: 600px;
+        }
+
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section label {
+            display: block;
+            font-weight: 600;
+            color: #c8c8c8;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .detail-section textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #5a5a5a;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+            background: #303030;
+            color: #f0f0f0;
+        }
+
+        .detail-section input[type="text"],
+        .detail-section input[type="color"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #5a5a5a;
+            border-radius: 8px;
+            font-size: 1em;
+            outline: none;
+            background: #303030;
+            color: #f0f0f0;
+        }
+
+        .detail-info {
+            background: #353535;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #a8a8a8;
+            border: 1px solid #4a4a4a;
+        }
+
+        .task-text-clickable {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .task-text-clickable:hover {
+            opacity: 0.7;
+        }
+
+        .daily-category-badge {
+            display: inline-block;
+            background: #4a4a4a;
+            color: #c8c8c8;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+            border: 1px solid #606060;
+        }
+
+        .task-group-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            margin: 15px 0 10px 0;
+            background: linear-gradient(90deg, rgba(90, 90, 90, 0.3) 0%, transparent 100%);
+            border-left: 4px solid #808080;
+            border-radius: 4px;
+        }
+
+        .task-group-header.independent {
+            background: linear-gradient(90deg, rgba(100, 100, 100, 0.3) 0%, transparent 100%);
+            border-left-color: #909090;
+        }
+
+        .task-group-header.shared {
+            background: linear-gradient(90deg, rgba(80, 80, 80, 0.3) 0%, transparent 100%);
+            border-left-color: #707070;
+        }
+
+        .task-group-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #c8c8c8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .task-group-count {
+            font-size: 0.75em;
+            color: #a8a8a8;
+            background: #3a3a3a;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 500;
+            border: 1px solid #4a4a4a;
+        }
+
+        .task-subsection {
+            margin-bottom: 15px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .header-btn {
+            background: rgba(90, 90, 90, 0.5);
+            color: #f0f0f0;
+            border: 2px solid #707070;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .header-btn:hover {
+            background: rgba(110, 110, 110, 0.5);
+            border-color: #808080;
+        }
+
+        .trash-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #3a3a3a;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #4a4a4a;
+        }
+
+        .trash-toggle label {
+            font-size: 0.9em;
+            color: #c8c8c8;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4a4a4a;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #909090;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #6a6a6a;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+            background-color: #d0d0d0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Daily Checklist</h1>
+            <p>Stay organized, achieve your goals</p>
+            <div class="header-controls">
+                <button id="trash-view-btn" class="header-btn" onclick="showTrash()">🗑️ View Trash</button>
+                <button id="back-btn" class="header-btn" onclick="showMain()" style="display: none;">← Back to Main</button>
+                <button class="header-btn" onclick="exportBackup()">💾 Backup</button>
+            </div>
+        </div>
+
+        <div class="date-selector">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <label for="task-date">📅 Select Date:</label>
+                    <input type="date" id="task-date" min="2020-01-01" max="2080-12-31">
+                </div>
+                <div class="trash-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="trash-toggle-checkbox" onchange="toggleTrashMode()" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <label for="trash-toggle-checkbox">Send completed Daily (Shared) tasks to Trash</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="categories-container"></div>
+
+            <div id="main-view" class="add-category-section">
+                <button class="add-category-btn" onclick="addCategory()">➕ Add New Category</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Task</div>
+            <input type="text" id="edit-task-input" class="modal-input" placeholder="Task text...">
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeEditModal()">Cancel</button>
+                <button class="modal-btn modal-btn-save" onclick="saveEditTask()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Details Modal -->
+    <div id="task-detail-modal" class="modal task-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">Task Details</div>
+
+            <div class="detail-section">
+                <label for="detail-task-title">Task Title</label>
+                <input type="text" id="detail-task-title" placeholder="Enter task title...">
+            </div>
+
+            <div class="detail-section">
+                <label for="detail-task-description">Task Description</label>
+                <textarea id="detail-task-description" placeholder="Enter task description..."></textarea>
+            </div>
+
+            <div class="detail-section">
+                <label>Task Type</label>
+                <div class="detail-info" id="detail-task-type"></div>
+            </div>
+
+            <div class="detail-section" id="detail-date-section" style="display: none;">
+                <label>Date Range</label>
+                <div class="detail-info" id="detail-task-dates"></div>
+            </div>
+
+            <div class="detail-section">
+                <label>Status</label>
+                <div class="detail-info" id="detail-task-status"></div>
+            </div>
+
+            <div class="detail-section" id="detail-category-section">
+                <label>Category</label>
+                <div class="detail-info" id="detail-task-category"></div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeTaskDetailModal()">Close</button>
+                <button class="modal-btn modal-btn-save" onclick="saveTaskDetails()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize with today's date
+        const dateInput = document.getElementById('task-date');
+        // Get current date in Seattle/Pacific timezone
+        const today = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }).split(',')[0];
+        const [month, day, year] = today.split('/');
+        const seattleDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        dateInput.value = seattleDate;
+
+        // Data structures
+        let checklistData = {};
+        let dailyTasks = {
+            independent: [], // Tasks that have independent completion states per day
+            shared: []       // Tasks that when completed, are removed from all days
+        };
+        let trash = []; // Trash for Daily (Shared) tasks
+        let sendToTrash = true; // Toggle for trash vs delete
+
+        // Edit modal state
+        let currentEditTask = null;
+        let currentDetailTask = null;
+
+        // Drag and drop state
+        let draggedTask = null;
+        let draggedFrom = null;
+
+        // View state
+        let currentView = 'main'; // 'main' or 'trash'
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('checklistData');
+            if (saved) {
+                checklistData = JSON.parse(saved);
+            }
+            const savedDaily = localStorage.getItem('dailyTasks');
+            if (savedDaily) {
+                dailyTasks = JSON.parse(savedDaily);
+            }
+            const savedTrash = localStorage.getItem('trash');
+            if (savedTrash) {
+                trash = JSON.parse(savedTrash);
+            }
+            const savedSendToTrash = localStorage.getItem('sendToTrash');
+            if (savedSendToTrash !== null) {
+                sendToTrash = JSON.parse(savedSendToTrash);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('checklistData', JSON.stringify(checklistData));
+            localStorage.setItem('dailyTasks', JSON.stringify(dailyTasks));
+            localStorage.setItem('trash', JSON.stringify(trash));
+            localStorage.setItem('sendToTrash', JSON.stringify(sendToTrash));
+        }
+
+        // Get current date
+        function getCurrentDate() {
+            return dateInput.value;
+        }
+
+        // Helper function to convert hex color to rgba with opacity
+        function hexToRgba(hex, opacity) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        }
+
+        // Initialize data structure for a date if it doesn't exist
+        function initDateData(date) {
+            if (!checklistData[date]) {
+                checklistData[date] = {
+                    categories: [],
+                    dailyCompletionStates: {} // Store completion states for daily independent tasks
+                };
+            }
+            // Ensure dailyCompletionStates exists even for old data
+            if (!checklistData[date].dailyCompletionStates) {
+                checklistData[date].dailyCompletionStates = {};
+            }
+        }
+
+        // Ensure Daily category exists
+        function ensureDailyCategory(date) {
+            initDateData(date);
+            let dailyCategory = checklistData[date].categories.find(cat => cat.isDefault === true);
+
+            if (!dailyCategory) {
+                dailyCategory = {
+                    id: 'daily-category',
+                    name: 'Daily',
+                    isDefault: true,
+                    tasks: []
+                };
+                checklistData[date].categories.unshift(dailyCategory);
+                saveData();
+            }
+
+            return dailyCategory;
+        }
+
+        // Add a new category
+        function addCategory() {
+            const date = getCurrentDate();
+            initDateData(date);
+
+            const newCategory = {
+                id: Date.now(),
+                name: 'New Category',
+                isDefault: false,
+                tasks: []
+            };
+
+            checklistData[date].categories.push(newCategory);
+            saveData();
+            renderView();
+        }
+
+        // Delete a category
+        function deleteCategory(categoryId) {
+            const date = getCurrentDate();
+            if (!checklistData[date]) return;
+
+            // Prevent deletion of default Daily category
+            const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+            if (category && category.isDefault) {
+                alert('Cannot delete the default Daily category!');
+                return;
+            }
+
+            checklistData[date].categories = checklistData[date].categories.filter(
+                cat => String(cat.id) !== String(categoryId)
+            );
+            saveData();
+            renderView();
+        }
+
+        // Update category name
+        function updateCategoryName(categoryId, newName) {
+            const date = getCurrentDate();
+            if (!checklistData[date]) return;
+
+            const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+            if (category && !category.isDefault) {
+                category.name = newName;
+                saveData();
+            }
+        }
+
+        // Generate date range
+        function getDateRange(startDate, endDate) {
+            const dates = [];
+            const current = new Date(startDate);
+            const end = new Date(endDate);
+
+            while (current <= end) {
+                dates.push(current.toISOString().split('T')[0]);
+                current.setDate(current.getDate() + 1);
+            }
+
+            return dates;
+        }
+
+        // Generate dates with repeat pattern
+        function getDatesWithRepeat(startDate, endDate, repeatType) {
+            const baseDates = getDateRange(startDate, endDate);
+            if (repeatType === 'none') return baseDates;
+
+            const allDates = new Set(baseDates);
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const maxDate = new Date('2080-12-31');
+            const minDate = new Date('2020-01-01');
+
+            baseDates.forEach(dateStr => {
+                const baseDate = new Date(dateStr);
+
+                if (repeatType === 'weekly') {
+                    // Repeat weekly on same weekday
+                    let current = new Date(baseDate);
+                    while (current <= maxDate) {
+                        current.setDate(current.getDate() + 7);
+                        if (current <= maxDate) {
+                            allDates.add(current.toISOString().split('T')[0]);
+                        }
+                    }
+                    current = new Date(baseDate);
+                    while (current >= minDate) {
+                        current.setDate(current.getDate() - 7);
+                        if (current >= minDate) {
+                            allDates.add(current.toISOString().split('T')[0]);
+                        }
+                    }
+                } else if (repeatType === 'monthly') {
+                    // Repeat monthly on same date
+                    let current = new Date(baseDate);
+                    while (current <= maxDate) {
+                        current.setMonth(current.getMonth() + 1);
+                        if (current <= maxDate) {
+                            allDates.add(current.toISOString().split('T')[0]);
+                        }
+                    }
+                    current = new Date(baseDate);
+                    while (current >= minDate) {
+                        current.setMonth(current.getMonth() - 1);
+                        if (current >= minDate) {
+                            allDates.add(current.toISOString().split('T')[0]);
+                        }
+                    }
+                } else if (repeatType === 'yearly') {
+                    // Repeat yearly on same date
+                    let current = new Date(baseDate);
+                    while (current <= maxDate) {
+                        current.setFullYear(current.getFullYear() + 1);
+                        if (current <= maxDate) {
+                            allDates.add(current.toISOString().split('T')[0]);
+                        }
+                    }
+                    current = new Date(baseDate);
+                    while (current >= minDate) {
+                        current.setFullYear(current.getFullYear() - 1);
+                        if (current >= minDate) {
+                            allDates.add(current.toISOString().split('T')[0]);
+                        }
+                    }
+                }
+            });
+
+            return Array.from(allDates).sort();
+        }
+
+        // Add a task to a category
+        function addTaskToCategory(categoryId) {
+            const inputId = `input-${categoryId}`;
+            const typeId = `type-${categoryId}`;
+            const startDateId = `start-date-${categoryId}`;
+            const endDateId = `end-date-${categoryId}`;
+            const repeatId = `repeat-${categoryId}`;
+
+            const input = document.getElementById(inputId);
+            const typeSelect = document.getElementById(typeId);
+            const startDateInput = document.getElementById(startDateId);
+            const endDateInput = document.getElementById(endDateId);
+            const repeatSelect = document.getElementById(repeatId);
+
+            if (!input || !typeSelect) {
+                console.error('Input elements not found');
+                return;
+            }
+
+            const taskText = input.value.trim();
+            if (!taskText) return;
+
+            const taskType = typeSelect.value;
+            const date = getCurrentDate();
+
+            const newTask = {
+                id: Date.now(),
+                text: taskText,
+                description: '',
+                completed: false,
+                color: '#ffffff',
+                opacity: 30,
+                type: taskType
+            };
+
+            if (taskType === 'regular') {
+                // Regular task - add to current date only
+                initDateData(date);
+                const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                if (category) {
+                    category.tasks.push(newTask);
+                }
+            } else if (taskType === 'daily-independent') {
+                // Daily independent task - add to dailyTasks.independent
+                dailyTasks.independent.push({
+                    ...newTask,
+                    globalId: `daily-ind-${newTask.id}`
+                });
+            } else if (taskType === 'daily-shared') {
+                // Daily shared task - add to dailyTasks.shared
+                dailyTasks.shared.push({
+                    ...newTask,
+                    globalId: `daily-shared-${newTask.id}`
+                });
+            } else if (taskType === 'duration') {
+                // Duration task - add to all dates in range (with optional repeat)
+                const startDate = startDateInput.value;
+                const endDate = endDateInput.value;
+                const repeatType = repeatSelect ? repeatSelect.value : 'none';
+
+                if (!startDate || !endDate) {
+                    alert('Please select both start and end dates for duration tasks!');
+                    return;
+                }
+
+                newTask.startDate = startDate;
+                newTask.endDate = endDate;
+                newTask.repeatType = repeatType;
+
+                const dates = getDatesWithRepeat(startDate, endDate, repeatType);
+                dates.forEach(d => {
+                    initDateData(d);
+                    const cat = checklistData[d].categories.find(cat => String(cat.id) === String(categoryId));
+                    if (cat) {
+                        cat.tasks.push({ ...newTask });
+                    }
+                });
+            }
+
+            saveData();
+            input.value = '';
+            renderView();
+        }
+
+        // Toggle task completion
+        function toggleTask(categoryId, taskId, taskType, globalId) {
+            const date = getCurrentDate();
+
+            if (taskType === 'daily-independent') {
+                // Toggle completion state for this specific date
+                initDateData(date);
+                if (!checklistData[date].dailyCompletionStates[globalId]) {
+                    checklistData[date].dailyCompletionStates[globalId] = true;
+                } else {
+                    checklistData[date].dailyCompletionStates[globalId] = !checklistData[date].dailyCompletionStates[globalId];
+                }
+            } else if (taskType === 'daily-shared') {
+                // Handle Daily (Shared) task completion
+                const task = dailyTasks.shared.find(t => t.globalId === globalId);
+                if (task) {
+                    if (sendToTrash) {
+                        // Move to trash instead of deleting
+                        trash.push({
+                            ...task,
+                            deletedDate: new Date().toISOString()
+                        });
+                    }
+                    // Remove from dailyTasks.shared (removes from all days)
+                    dailyTasks.shared = dailyTasks.shared.filter(t => t.globalId !== globalId);
+                }
+            } else {
+                // Regular or duration task
+                if (!checklistData[date]) return;
+                const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                if (!category) return;
+
+                const task = category.tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.completed = !task.completed;
+                }
+            }
+
+            saveData();
+            renderView();
+        }
+
+        // Update task color
+        function updateTaskColorAndOpacity(categoryId, taskId, color, opacity, taskType, globalId) {
+            const date = getCurrentDate();
+
+            if (taskType === 'daily-independent') {
+                const task = dailyTasks.independent.find(t => t.globalId === globalId);
+                if (task) {
+                    if (color !== null) task.color = color;
+                    if (opacity !== null) task.opacity = parseInt(opacity);
+                }
+            } else if (taskType === 'daily-shared') {
+                const task = dailyTasks.shared.find(t => t.globalId === globalId);
+                if (task) {
+                    if (color !== null) task.color = color;
+                    if (opacity !== null) task.opacity = parseInt(opacity);
+                }
+            } else if (taskType === 'duration') {
+                // Update all instances of this duration task
+                if (!checklistData[date]) return;
+                const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                if (!category) return;
+
+                const task = category.tasks.find(t => t.id === taskId);
+                if (!task || !task.startDate || !task.endDate) return;
+
+                const dates = getDatesWithRepeat(task.startDate, task.endDate, task.repeatType || 'none');
+                dates.forEach(d => {
+                    if (checklistData[d]) {
+                        const cat = checklistData[d].categories.find(cat => String(cat.id) === String(categoryId));
+                        if (cat) {
+                            const t = cat.tasks.find(t => t.id === taskId);
+                            if (t) {
+                                if (color !== null) t.color = color;
+                                if (opacity !== null) t.opacity = parseInt(opacity);
+                            }
+                        }
+                    }
+                });
+            } else {
+                if (!checklistData[date]) return;
+                const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                if (!category) return;
+
+                const task = category.tasks.find(t => t.id === taskId);
+                if (task) {
+                    if (color !== null) task.color = color;
+                    if (opacity !== null) task.opacity = parseInt(opacity);
+                }
+            }
+
+            saveData();
+            renderView();
+        }
+
+        // Delete a task
+        function deleteTask(categoryId, taskId, taskType, globalId) {
+            const date = getCurrentDate();
+
+            if (taskType === 'daily-independent') {
+                dailyTasks.independent = dailyTasks.independent.filter(t => t.globalId !== globalId);
+            } else if (taskType === 'daily-shared') {
+                dailyTasks.shared = dailyTasks.shared.filter(t => t.globalId !== globalId);
+            } else if (taskType === 'duration') {
+                // For duration tasks, find the task to get its date range and repeat settings
+                if (!checklistData[date]) return;
+                const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                if (!category) return;
+
+                const task = category.tasks.find(t => t.id === taskId);
+                if (!task || !task.startDate || !task.endDate) return;
+
+                // Get all dates including repeat pattern
+                const dates = getDatesWithRepeat(task.startDate, task.endDate, task.repeatType || 'none');
+
+                // Delete the task from all dates
+                dates.forEach(d => {
+                    if (checklistData[d]) {
+                        const cat = checklistData[d].categories.find(cat => String(cat.id) === String(categoryId));
+                        if (cat) {
+                            cat.tasks = cat.tasks.filter(t => t.id !== taskId);
+                        }
+                    }
+                });
+            } else {
+                // Regular task - only delete from current date
+                if (!checklistData[date]) return;
+                const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                if (!category) return;
+
+                category.tasks = category.tasks.filter(t => t.id !== taskId);
+            }
+
+            saveData();
+            renderView();
+        }
+
+        // Edit task modal functions
+        function openEditModal(categoryId, taskId, taskType, globalId) {
+            const date = getCurrentDate();
+            let task = null;
+
+            if (taskType === 'daily-independent') {
+                task = dailyTasks.independent.find(t => t.globalId === globalId);
+            } else if (taskType === 'daily-shared') {
+                task = dailyTasks.shared.find(t => t.globalId === globalId);
+            } else {
+                const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                if (category) {
+                    task = category.tasks.find(t => t.id === taskId);
+                }
+            }
+
+            if (task) {
+                currentEditTask = { categoryId, taskId, taskType, globalId, task };
+                document.getElementById('edit-task-input').value = task.text;
+                document.getElementById('edit-modal').classList.add('active');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.remove('active');
+            currentEditTask = null;
+        }
+
+        // Task Detail Modal functions
+        function openTaskDetailModal(categoryId, taskId, taskType, globalId) {
+            const date = getCurrentDate();
+            let task = null;
+            let categoryName = '';
+
+            if (taskType === 'daily-independent') {
+                task = dailyTasks.independent.find(t => t.globalId === globalId);
+                categoryName = 'Daily';
+            } else if (taskType === 'daily-shared') {
+                task = dailyTasks.shared.find(t => t.globalId === globalId);
+                categoryName = 'Daily';
+            } else {
+                const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                if (category) {
+                    task = category.tasks.find(t => t.id === taskId);
+                    categoryName = category.name;
+                }
+            }
+
+            if (!task) return;
+
+            currentDetailTask = { categoryId, taskId, taskType, globalId, task };
+
+            // Populate modal
+            document.getElementById('detail-task-title').value = task.text || '';
+            document.getElementById('detail-task-description').value = task.description || '';
+
+            // Task type info
+            let typeText = '';
+            if (taskType === 'daily-independent') {
+                typeText = 'Daily (Independent) - Completion state is independent for each day';
+            } else if (taskType === 'daily-shared') {
+                typeText = 'Daily (Shared) - Completing on any day removes from all days';
+            } else if (taskType === 'duration') {
+                typeText = 'Duration - Appears only within specified date range';
+            } else {
+                typeText = 'Regular - Appears only on specific date';
+            }
+            document.getElementById('detail-task-type').textContent = typeText;
+
+            // Date range (for duration tasks)
+            if (taskType === 'duration' && task.startDate && task.endDate) {
+                document.getElementById('detail-date-section').style.display = 'block';
+                document.getElementById('detail-task-dates').textContent = `${task.startDate} to ${task.endDate}`;
+            } else {
+                document.getElementById('detail-date-section').style.display = 'none';
+            }
+
+            // Status
+            let statusText = '';
+            if (taskType === 'daily-independent') {
+                const completionState = checklistData[date]?.dailyCompletionStates?.[globalId] || false;
+                statusText = completionState ? 'Completed (on this date)' : 'Not completed (on this date)';
+            } else {
+                statusText = task.completed ? 'Completed' : 'Not completed';
+            }
+            document.getElementById('detail-task-status').textContent = statusText;
+
+            // Category
+            document.getElementById('detail-task-category').textContent = categoryName;
+
+            // Show modal
+            document.getElementById('task-detail-modal').classList.add('active');
+        }
+
+        function closeTaskDetailModal() {
+            document.getElementById('task-detail-modal').classList.remove('active');
+            currentDetailTask = null;
+        }
+
+        function saveTaskDetails() {
+            if (!currentDetailTask) return;
+
+            const newTitle = document.getElementById('detail-task-title').value.trim();
+            const newDescription = document.getElementById('detail-task-description').value.trim();
+
+            if (!newTitle) {
+                alert('Task title cannot be empty!');
+                return;
+            }
+
+            const { categoryId, taskId, taskType, globalId, task } = currentDetailTask;
+            const date = getCurrentDate();
+
+            // Update title and description
+            if (taskType === 'daily-independent') {
+                const t = dailyTasks.independent.find(t => t.globalId === globalId);
+                if (t) {
+                    t.text = newTitle;
+                    t.description = newDescription;
+                }
+            } else if (taskType === 'daily-shared') {
+                const t = dailyTasks.shared.find(t => t.globalId === globalId);
+                if (t) {
+                    t.text = newTitle;
+                    t.description = newDescription;
+                }
+            } else if (taskType === 'duration') {
+                // Update all instances of this duration task
+                const startDate = task.startDate;
+                const endDate = task.endDate;
+                const dates = getDatesWithRepeat(startDate, endDate, task.repeatType || 'none');
+
+                dates.forEach(d => {
+                    if (checklistData[d]) {
+                        const cat = checklistData[d].categories.find(cat => String(cat.id) === String(categoryId));
+                        if (cat) {
+                            const t = cat.tasks.find(t => t.id === taskId);
+                            if (t) {
+                                t.text = newTitle;
+                                t.description = newDescription;
+                            }
+                        }
+                    }
+                });
+            } else {
+                // Regular task
+                if (checklistData[date]) {
+                    const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                    if (category) {
+                        const t = category.tasks.find(t => t.id === taskId);
+                        if (t) {
+                            t.text = newTitle;
+                            t.description = newDescription;
+                        }
+                    }
+                }
+            }
+
+            saveData();
+            closeTaskDetailModal();
+            renderView();
+        }
+
+        function saveEditTask() {
+            if (!currentEditTask) return;
+
+            const newText = document.getElementById('edit-task-input').value.trim();
+            if (!newText) return;
+
+            const { categoryId, taskId, taskType, globalId, task } = currentEditTask;
+            const date = getCurrentDate();
+
+            if (taskType === 'daily-independent') {
+                const t = dailyTasks.independent.find(t => t.globalId === globalId);
+                if (t) t.text = newText;
+            } else if (taskType === 'daily-shared') {
+                const t = dailyTasks.shared.find(t => t.globalId === globalId);
+                if (t) t.text = newText;
+            } else if (taskType === 'duration') {
+                // Update all instances of this duration task
+                const startDate = task.startDate;
+                const endDate = task.endDate;
+                const dates = getDatesWithRepeat(startDate, endDate, task.repeatType || 'none');
+
+                dates.forEach(d => {
+                    if (checklistData[d]) {
+                        const cat = checklistData[d].categories.find(cat => String(cat.id) === String(categoryId));
+                        if (cat) {
+                            const t = cat.tasks.find(t => t.id === taskId);
+                            if (t) t.text = newText;
+                        }
+                    }
+                });
+            } else {
+                // Regular task
+                if (checklistData[date]) {
+                    const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+                    if (category) {
+                        const t = category.tasks.find(t => t.id === taskId);
+                        if (t) t.text = newText;
+                    }
+                }
+            }
+
+            saveData();
+            closeEditModal();
+            renderView();
+        }
+
+        // Drag and drop functions
+        function handleDragStart(e, categoryId, taskId, taskType, globalId) {
+            draggedTask = { categoryId, taskId, taskType, globalId };
+            draggedFrom = categoryId;
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+            draggedTask = null;
+            draggedFrom = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            const taskItem = e.target.closest('.task-item');
+            if (taskItem) {
+                taskItem.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            const taskItem = e.target.closest('.task-item');
+            if (taskItem) {
+                taskItem.classList.remove('drag-over');
+            }
+        }
+
+        function handleDrop(e, targetCategoryId, targetTaskId) {
+            e.preventDefault();
+            e.target.closest('.task-item')?.classList.remove('drag-over');
+
+            if (!draggedTask) return;
+
+            const date = getCurrentDate();
+            const { categoryId: sourceCategoryId, taskId: sourceTaskId, taskType, globalId } = draggedTask;
+
+            initDateData(date);
+
+            const sourceCategory = checklistData[date].categories.find(cat => String(cat.id) === String(sourceCategoryId));
+            const targetCategory = checklistData[date].categories.find(cat => String(cat.id) === String(targetCategoryId));
+
+            if (!sourceCategory || !targetCategory) return;
+
+            // Handle Daily tasks
+            if (taskType === 'daily-independent' || taskType === 'daily-shared') {
+                // Daily tasks can only be moved within the Daily category
+                if (!targetCategory.isDefault) {
+                    alert('Daily tasks can only be moved within the Daily category!');
+                    return;
+                }
+
+                // Get all tasks including Daily tasks for reordering
+                const allTasks = [];
+
+                // Add daily independent tasks
+                dailyTasks.independent.forEach(task => {
+                    allTasks.push({
+                        type: 'daily-independent',
+                        data: task,
+                        globalId: task.globalId
+                    });
+                });
+
+                // Add daily shared tasks
+                dailyTasks.shared.forEach(task => {
+                    allTasks.push({
+                        type: 'daily-shared',
+                        data: task,
+                        globalId: task.globalId
+                    });
+                });
+
+                // Find source and target indices
+                const sourceIndex = allTasks.findIndex(t => t.globalId === globalId);
+                let targetIndex;
+
+                if (targetTaskId) {
+                    // Find the target task (could be daily-independent, daily-shared, or regular)
+                    targetIndex = allTasks.findIndex(t => t.globalId === targetTaskId || (t.data && t.data.id === targetTaskId));
+                } else {
+                    targetIndex = allTasks.length;
+                }
+
+                if (sourceIndex === -1) return;
+
+                // Remove from source array
+                const [movedTask] = allTasks.splice(sourceIndex, 1);
+
+                // Adjust target index if needed
+                if (sourceIndex < targetIndex) {
+                    targetIndex--;
+                }
+
+                // Insert at new position
+                allTasks.splice(targetIndex, 0, movedTask);
+
+                // Rebuild the dailyTasks arrays with new order
+                dailyTasks.independent = [];
+                dailyTasks.shared = [];
+
+                allTasks.forEach(item => {
+                    if (item.type === 'daily-independent') {
+                        dailyTasks.independent.push(item.data);
+                    } else if (item.type === 'daily-shared') {
+                        dailyTasks.shared.push(item.data);
+                    }
+                });
+
+                saveData();
+                renderView();
+                return;
+            }
+
+            // Handle regular and duration tasks (existing logic)
+            const sourceTaskIndex = sourceCategory.tasks.findIndex(t => t.id === sourceTaskId);
+            if (sourceTaskIndex === -1) return;
+
+            const task = sourceCategory.tasks[sourceTaskIndex];
+
+            // Remove from source
+            sourceCategory.tasks.splice(sourceTaskIndex, 1);
+
+            // Add to target
+            if (targetTaskId) {
+                const targetTaskIndex = targetCategory.tasks.findIndex(t => t.id === targetTaskId);
+                targetCategory.tasks.splice(targetTaskIndex, 0, task);
+            } else {
+                targetCategory.tasks.push(task);
+            }
+
+            saveData();
+            renderView();
+        }
+
+        function handleDropOnCategory(e, categoryId) {
+            e.preventDefault();
+
+            if (!draggedTask) return;
+
+            const date = getCurrentDate();
+            const { categoryId: sourceCategoryId, taskId: sourceTaskId, taskType } = draggedTask;
+
+            initDateData(date);
+            const targetCategory = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
+
+            if (!targetCategory) return;
+
+            // Daily tasks can only be dropped on Daily category
+            if (taskType === 'daily-independent' || taskType === 'daily-shared') {
+                if (!targetCategory.isDefault) {
+                    alert('Daily tasks can only be moved within the Daily category!');
+                    return;
+                }
+                // If dropping on the same Daily category, ignore
+                return;
+            }
+
+            if (sourceCategoryId === categoryId) return;
+
+            const sourceCategory = checklistData[date].categories.find(cat => String(cat.id) === String(sourceCategoryId));
+
+            if (!sourceCategory || !targetCategory) return;
+
+            const sourceTaskIndex = sourceCategory.tasks.findIndex(t => t.id === sourceTaskId);
+            if (sourceTaskIndex === -1) return;
+
+            const task = sourceCategory.tasks[sourceTaskIndex];
+
+            // Remove from source
+            sourceCategory.tasks.splice(sourceTaskIndex, 1);
+
+            // Add to end of target
+            targetCategory.tasks.push(task);
+
+            saveData();
+            renderView();
+        }
+
+        // Task type change handler
+        function handleTaskTypeChange(categoryId) {
+            const typeId = `type-${categoryId}`;
+            const durationId = `duration-${categoryId}`;
+
+            const typeSelect = document.getElementById(typeId);
+            const durationDiv = document.getElementById(durationId);
+
+            if (typeSelect.value === 'duration') {
+                durationDiv.style.display = 'flex';
+            } else {
+                durationDiv.style.display = 'none';
+            }
+        }
+
+        // Trash functions
+        function toggleTrashMode() {
+            sendToTrash = !sendToTrash;
+            saveData();
+            renderView();
+        }
+
+        function showTrash() {
+            currentView = 'trash';
+            renderView();
+        }
+
+        function showMain() {
+            currentView = 'main';
+            renderView();
+        }
+
+        function restoreFromTrash(globalId) {
+            const task = trash.find(t => t.globalId === globalId);
+            if (task) {
+                // Remove deletedDate property and restore to shared tasks
+                const { deletedDate, ...restoredTask } = task;
+                dailyTasks.shared.push(restoredTask);
+                trash = trash.filter(t => t.globalId !== globalId);
+                saveData();
+                renderView();
+            }
+        }
+
+        function deleteFromTrash(globalId) {
+            trash = trash.filter(t => t.globalId !== globalId);
+            saveData();
+            renderView();
+        }
+
+        function emptyTrash() {
+            if (confirm('Are you sure you want to permanently delete all items in trash?')) {
+                trash = [];
+                saveData();
+                renderView();
+            }
+        }
+
+        // Backup function
+        function exportBackup() {
+            const data = {
+                checklistData: checklistData,
+                dailyTasks: dailyTasks,
+                trash: trash,
+                sendToTrash: sendToTrash,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'checklist-backup-' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            alert('Backup downloaded successfully!');
+        }
+
+        function renderTrashView() {
+            const container = document.getElementById('categories-container');
+            container.innerHTML = '';
+
+            const trashDiv = document.createElement('div');
+            trashDiv.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <h2 style="font-size: 2em; margin-bottom: 20px;">🗑️ Trash</h2>
+                    <p style="color: #6c757d; margin-bottom: 20px;">Deleted Daily (Shared) tasks</p>
+                    ${trash.length > 0 ? `<button onclick="emptyTrash()" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 20px;">Empty Trash</button>` : ''}
+                </div>
+            `;
+            container.appendChild(trashDiv);
+
+            if (trash.length === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-state';
+                emptyDiv.textContent = 'Trash is empty';
+                container.appendChild(emptyDiv);
+            } else {
+                const taskList = document.createElement('div');
+                taskList.style.maxWidth = '700px';
+                taskList.style.margin = '0 auto';
+
+                trash.forEach(task => {
+                    const deletedDate = new Date(task.deletedDate);
+                    const formattedDate = deletedDate.toLocaleString();
+
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = 'task-item';
+                    taskDiv.style.cursor = 'default';
+
+                    // Apply background color with opacity to the entire task item
+                    const opacity = task.opacity !== undefined ? task.opacity / 100 : 1;
+                    const rgbaColor = hexToRgba(task.color || '#ffffff', opacity);
+                    taskDiv.style.backgroundColor = rgbaColor;
+
+                    taskDiv.innerHTML = `
+                        <div class="task-content">
+                            <div>
+                                <span class="task-text">
+                                    ${task.text}
+                                </span>
+                                <span class="task-type-badge badge-daily-shared">Daily Shared</span>
+                            </div>
+                            <div class="task-date-label">Deleted: ${formattedDate}</div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="edit-task-btn" onclick="restoreFromTrash('${task.globalId}')" style="background: #28a745;">Restore</button>
+                            <button class="delete-task-btn" onclick="deleteFromTrash('${task.globalId}')">Delete</button>
+                        </div>
+                    `;
+                    taskList.appendChild(taskDiv);
+                });
+
+                container.appendChild(taskList);
+            }
+        }
+
+        function renderView() {
+            // Update trash toggle checkbox
+            const trashCheckbox = document.getElementById('trash-toggle-checkbox');
+            if (trashCheckbox) {
+                trashCheckbox.checked = sendToTrash;
+            }
+
+            if (currentView === 'trash') {
+                document.getElementById('main-view').style.display = 'none';
+                document.getElementById('trash-view-btn').style.display = 'none';
+                document.getElementById('back-btn').style.display = 'inline-block';
+                renderTrashView();
+            } else {
+                document.getElementById('main-view').style.display = 'block';
+                document.getElementById('trash-view-btn').style.display = 'inline-block';
+                document.getElementById('back-btn').style.display = 'none';
+                renderCategories();
+            }
+        }
+
+        // Render all categories
+        function renderCategories() {
+            const date = getCurrentDate();
+            const container = document.getElementById('categories-container');
+
+            try {
+                if (!container) {
+                    console.error('Container not found!');
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                // Ensure Daily category exists
+                ensureDailyCategory(date);
+
+                if (!checklistData[date]) {
+                    console.error('No data for date:', date);
+                    container.innerHTML = '<div class="empty-state">Error: No data structure. Please refresh.</div>';
+                    return;
+                }
+
+                if (checklistData[date].categories.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Click "Add New Category" to get started!</div>';
+                    return;
+                }
+            } catch (error) {
+                console.error('Error in renderCategories:', error);
+                if (container) {
+                    container.innerHTML = '<div class="empty-state" style="color: red;">Error: ' + error.message + '</div>';
+                }
+                return;
+            }
+
+            checklistData[date].categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'category-section';
+
+                const isDaily = category.isDefault;
+                const deleteButton = isDaily ? '' : `<button class="delete-category-btn" onclick="deleteCategory('${category.id}')">🗑️ Delete</button>`;
+                const dailyBadge = isDaily ? '<span class="daily-category-badge">⭐ Default</span>' : '';
+                const nameInput = isDaily ?
+                    `<span style="font-size: 1em; font-weight: 600; color: #495057; padding: 5px;">${category.name}</span>` :
+                    `<input type="text" value="${category.name}" onchange="updateCategoryName('${category.id}', this.value)" placeholder="Category name">`;
+
+                // Different task type options for Daily category vs regular categories
+                const taskTypeOptions = isDaily ? `
+                    <option value="regular">Regular</option>
+                    <option value="daily-independent">Daily (Independent)</option>
+                    <option value="daily-shared">Daily (Shared)</option>
+                    <option value="duration">Duration</option>
+                ` : `
+                    <option value="regular">Regular</option>
+                    <option value="duration">Duration</option>
+                `;
+
+                categoryDiv.innerHTML = `
+                    <div class="category-header">
+                        <div class="category-name">
+                            ${nameInput}
+                            ${dailyBadge}
+                        </div>
+                        ${deleteButton}
+                    </div>
+                    <div class="task-list" id="tasks-${category.id}"
+                         ondragover="event.preventDefault()"
+                         ondrop="handleDropOnCategory(event, '${category.id}')">
+                    </div>
+                    <div class="add-task-section">
+                        <input
+                            type="text"
+                            class="task-input"
+                            id="input-${category.id}"
+                            placeholder="Enter a new task..."
+                            onkeypress="if(event.key === 'Enter') { addTaskToCategory('${category.id}'); }"
+                        >
+                        <div class="task-options">
+                            <div class="task-type-selector">
+                                <label>Type:</label>
+                                <select id="type-${category.id}" onchange="handleTaskTypeChange('${category.id}')">
+                                    ${taskTypeOptions}
+                                </select>
+                            </div>
+                            <div class="duration-inputs" id="duration-${category.id}" style="display: none;">
+                                <label>From:</label>
+                                <input type="date" id="start-date-${category.id}" min="2020-01-01" max="2080-12-31">
+                                <label>To:</label>
+                                <input type="date" id="end-date-${category.id}" min="2020-01-01" max="2080-12-31">
+                                <div style="margin-top: 5px;">
+                                    <label>Repeat:</label>
+                                    <select id="repeat-${category.id}">
+                                        <option value="none">No repeat</option>
+                                        <option value="weekly">Weekly (same weekday)</option>
+                                        <option value="monthly">Monthly (same date)</option>
+                                        <option value="yearly">Yearly (same date)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="add-task-btn" onclick="addTaskToCategory('${category.id}')">Add Task</button>
+                    </div>
+                `;
+                container.appendChild(categoryDiv);
+
+                // Render tasks
+                const taskList = document.getElementById(`tasks-${category.id}`);
+
+                if (isDaily) {
+                    // For Daily category, render with sections
+                    taskList.innerHTML = '';
+
+                    // Daily Independent Section
+                    if (dailyTasks.independent.length > 0) {
+                        const independentSection = document.createElement('div');
+                        independentSection.className = 'task-subsection';
+                        independentSection.innerHTML = `
+                            <div class="task-group-header independent">
+                                <div class="task-group-title">
+                                    <span>📋</span>
+                                    <span>Daily (Independent)</span>
+                                </div>
+                                <span class="task-group-count">${dailyTasks.independent.length} task${dailyTasks.independent.length > 1 ? 's' : ''}</span>
+                            </div>
+                        `;
+                        taskList.appendChild(independentSection);
+
+                        dailyTasks.independent.forEach(task => {
+                            const completionState = checklistData[date]?.dailyCompletionStates?.[task.globalId] || false;
+                            const taskDiv = createTaskElement(task, category.id, 'daily-independent', completionState, date);
+                            taskList.appendChild(taskDiv);
+                        });
+                    }
+
+                    // Daily Shared Section
+                    if (dailyTasks.shared.length > 0) {
+                        const sharedSection = document.createElement('div');
+                        sharedSection.className = 'task-subsection';
+                        sharedSection.innerHTML = `
+                            <div class="task-group-header shared">
+                                <div class="task-group-title">
+                                    <span>🔗</span>
+                                    <span>Daily (Shared)</span>
+                                </div>
+                                <span class="task-group-count">${dailyTasks.shared.length} task${dailyTasks.shared.length > 1 ? 's' : ''}</span>
+                            </div>
+                        `;
+                        taskList.appendChild(sharedSection);
+
+                        dailyTasks.shared.forEach(task => {
+                            const taskDiv = createTaskElement(task, category.id, 'daily-shared', false, date);
+                            taskList.appendChild(taskDiv);
+                        });
+                    }
+
+                    // Regular tasks in Daily category
+                    if (category.tasks.length > 0) {
+                        const regularSection = document.createElement('div');
+                        regularSection.className = 'task-subsection';
+                        regularSection.innerHTML = `
+                            <div class="task-group-header">
+                                <div class="task-group-title">
+                                    <span>📌</span>
+                                    <span>Regular & Duration Tasks</span>
+                                </div>
+                                <span class="task-group-count">${category.tasks.length} task${category.tasks.length > 1 ? 's' : ''}</span>
+                            </div>
+                        `;
+                        taskList.appendChild(regularSection);
+
+                        category.tasks.forEach(task => {
+                            const taskDiv = createTaskElement(task, category.id, task.type || 'regular', task.completed, date);
+                            taskList.appendChild(taskDiv);
+                        });
+                    }
+
+                    // Show empty state if no tasks at all
+                    if (dailyTasks.independent.length === 0 && dailyTasks.shared.length === 0 && category.tasks.length === 0) {
+                        taskList.innerHTML = '<div class="empty-state">No tasks in this category</div>';
+                    }
+                } else {
+                    // For non-Daily categories, render normally
+                    if (category.tasks.length === 0) {
+                        taskList.innerHTML = '<div class="empty-state">No tasks in this category</div>';
+                    } else {
+                        taskList.innerHTML = '';
+                        category.tasks.forEach(task => {
+                            const taskDiv = createTaskElement(task, category.id, task.type || 'regular', task.completed, date);
+                            taskList.appendChild(taskDiv);
+                        });
+                    }
+                }
+            });
+        }
+
+        // Helper function to create task element
+        function createTaskElement(task, categoryId, taskType, completed, date) {
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'task-item';
+            taskDiv.draggable = true;
+
+            let badge = '';
+            let dateLabel = '';
+            let globalId = task.globalId || '';
+
+            if (taskType === 'daily-independent') {
+                badge = '<span class="task-type-badge badge-daily-independent">Daily Independent</span>';
+            } else if (taskType === 'daily-shared') {
+                badge = '<span class="task-type-badge badge-daily-shared">Daily Shared</span>';
+            } else if (taskType === 'duration' && task.startDate && task.endDate) {
+                badge = '<span class="task-type-badge badge-duration">Duration</span>';
+                dateLabel = `<div class="task-date-label">📅 ${task.startDate} ~ ${task.endDate}</div>`;
+            }
+
+            // Set up drag and drop handlers
+            taskDiv.ondragstart = (e) => handleDragStart(e, categoryId, task.id, taskType, globalId);
+            taskDiv.ondragend = handleDragEnd;
+            taskDiv.ondragover = handleDragOver;
+            taskDiv.ondragleave = handleDragLeave;
+            taskDiv.ondrop = (e) => handleDrop(e, categoryId, task.id);
+
+            // Apply background color with opacity
+            const opacity = task.opacity !== undefined ? task.opacity / 100 : 1;
+            const rgbaColor = hexToRgba(task.color || '#ffffff', opacity);
+            taskDiv.style.backgroundColor = rgbaColor;
+
+            taskDiv.innerHTML = `
+                <input
+                    type="checkbox"
+                    class="task-checkbox"
+                    ${completed ? 'checked' : ''}
+                    onchange="toggleTask('${categoryId}', ${task.id}, '${taskType}', '${globalId}')"
+                >
+                <div class="task-content" onclick="openTaskDetailModal('${categoryId}', ${task.id}, '${taskType}', '${globalId}')" style="cursor: pointer;">
+                    <div>
+                        <span class="task-text task-text-clickable ${completed ? 'completed' : ''}">
+                            ${task.text}
+                        </span>
+                        ${badge}
+                    </div>
+                    ${dateLabel}
+                </div>
+                <div class="task-actions">
+                    <div style="display: flex; align-items: center; gap: 5px;">
+                        <input
+                            type="color"
+                            class="color-picker"
+                            value="${task.color}"
+                            onchange="updateTaskColorAndOpacity('${categoryId}', ${task.id}, this.value, null, '${taskType}', '${globalId}')"
+                            title="Change background color"
+                        >
+                        <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value="${task.opacity !== undefined ? task.opacity : 30}"
+                            onchange="updateTaskColorAndOpacity('${categoryId}', ${task.id}, null, this.value, '${taskType}', '${globalId}')"
+                            title="Change opacity"
+                            style="width: 60px;"
+                        >
+                    </div>
+                    <button class="edit-task-btn" onclick="openEditModal('${categoryId}', ${task.id}, '${taskType}', '${globalId}')">Edit</button>
+                    <button class="delete-task-btn" onclick="deleteTask('${categoryId}', ${task.id}, '${taskType}', '${globalId}')">Delete</button>
+                </div>
+            `;
+
+            return taskDiv;
+        }
+
+        // Event listener for date change
+        dateInput.addEventListener('change', () => {
+            if (currentView === 'main') {
+                renderView();
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('edit-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeEditModal();
+            }
+        });
+
+        document.getElementById('task-detail-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeTaskDetailModal();
+            }
+        });
+
+        // Initialize app
+        loadData();
+        renderView();
+    </script>
+</body>
+</html>

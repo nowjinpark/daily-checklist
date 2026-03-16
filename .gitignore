@@ -1,0 +1,20 @@
+.claude/
+output/
+
+# Local backups and personal checklist exports
+checklist-backup-*.json
+
+# Working files and local experiments
+index_backup.html
+recovery.html
+test_debug.html
+
+# Local screenshots or captures
+*.png
+*.jpg
+*.jpeg
+*.webp
+
+# OS/editor noise
+Thumbs.db
+.DS_Store
