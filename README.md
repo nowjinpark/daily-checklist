@@ -1,3 +1,8 @@
+## Language
+
+- [English](./README.md)
+- [한국어](./README.ko.md)
+
 # Daily Checklist
 
 A lightweight single-file checklist app built as my first vibe-coding project. It helps track day-by-day tasks in the browser with no backend and no account setup.
@@ -59,6 +64,7 @@ Then open `http://localhost:8000`.
 .
 |-- index.html
 |-- README.md
+|-- README.ko.md
 `-- .gitignore
 ```
 
