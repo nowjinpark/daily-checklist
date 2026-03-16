@@ -37,6 +37,12 @@ Suggested GitHub repository description:
 - Vanilla JavaScript
 - `localStorage` for client-side persistence
 
+## Compatibility
+
+- Works on both Windows and macOS
+- Runs in modern browsers such as Chrome, Safari, and Arc
+- No installation is required beyond opening the static app in a browser
+
 ## Privacy and Data Handling
 
 - The app stores checklist data in the browser's `localStorage`.

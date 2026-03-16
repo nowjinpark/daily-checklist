@@ -37,6 +37,12 @@
 - Vanilla JavaScript
 - 브라우저 `localStorage` 기반 클라이언트 저장
 
+## 호환성
+
+- Windows와 macOS에서 모두 사용할 수 있습니다
+- Chrome, Safari, Arc 같은 최신 브라우저에서 실행됩니다
+- 별도 설치 없이 브라우저에서 정적 앱을 열어 바로 사용할 수 있습니다
+
 ## 개인정보 및 데이터 처리
 
 - 앱 데이터는 브라우저의 `localStorage`에 저장됩니다.
