@@ -68,11 +68,19 @@ Then open `http://localhost:8000`.
 
 ```text
 .
+|-- app-icon.svg
+|-- docs/
 |-- index.html
+|-- manifest.webmanifest
 |-- README.md
 |-- README.ko.md
+|-- service-worker.js
 `-- .gitignore
 ```
+
+## Documentation
+
+Implementation notes, data-safety rules, and future roadmap documents are available in [docs/README.md](./docs/README.md).
 
 ## What I Focused On
 

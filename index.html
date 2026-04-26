@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#2f6f73">
+    <link rel="manifest" href="manifest.webmanifest">
     <title>Daily Checklist</title>
     <style>
         * {
@@ -676,6 +678,268 @@
             transform: translateX(26px);
             background-color: #d0d0d0;
         }
+
+        .restore-input {
+            display: none;
+        }
+
+        .calendar-shell {
+            background: #32383a;
+            border-bottom: 2px solid #4a4f50;
+            padding: 24px 30px 30px;
+        }
+
+        .calendar-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .calendar-toolbar h2 {
+            color: #f0f4f4;
+            font-size: 1.45em;
+            text-align: center;
+            flex: 1;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .calendar-btn {
+            background: #40595b;
+            color: #f6fbfb;
+            border: 1px solid #5f7779;
+            padding: 9px 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 700;
+            min-width: 42px;
+        }
+
+        .calendar-btn:hover {
+            background: #4b686a;
+        }
+
+        .calendar-weekdays,
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .calendar-weekday {
+            color: #b9c8c9;
+            font-size: 0.78em;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            padding-bottom: 2px;
+        }
+
+        .calendar-grid {
+            margin-top: 8px;
+        }
+
+        .calendar-day {
+            min-height: 96px;
+            background: #293031;
+            border: 1px solid #465153;
+            border-radius: 8px;
+            color: #edf3f3;
+            cursor: pointer;
+            padding: 10px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .calendar-day:hover {
+            border-color: #7ea6a8;
+            background: #333c3d;
+        }
+
+        .calendar-day.outside-month {
+            opacity: 0.45;
+        }
+
+        .calendar-day.today {
+            border-color: #d7a843;
+        }
+
+        .calendar-day.selected {
+            background: #2f6f73;
+            border-color: #8cced0;
+            box-shadow: 0 0 0 2px rgba(140, 206, 208, 0.24);
+        }
+
+        .calendar-day.has-tasks .calendar-day-number {
+            color: #ffffff;
+        }
+
+        .calendar-day-number {
+            font-size: 1.05em;
+            font-weight: 800;
+        }
+
+        .calendar-day-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            min-height: 24px;
+        }
+
+        .calendar-pill {
+            border-radius: 999px;
+            padding: 3px 7px;
+            background: rgba(255, 255, 255, 0.12);
+            color: #edf3f3;
+            font-size: 0.74em;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .calendar-pill.done {
+            background: rgba(215, 168, 67, 0.22);
+            color: #ffe7ad;
+        }
+
+        .selected-day-panel {
+            background: #3d3d3d;
+            padding: 30px;
+        }
+
+        .selected-day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 14px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #555;
+            padding-bottom: 18px;
+        }
+
+        .selected-day-kicker {
+            color: #9bb7b8;
+            font-size: 0.78em;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .selected-day-title {
+            color: #f3f6f6;
+            font-size: 1.8em;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .selected-day-meta {
+            color: #b9c8c9;
+            font-size: 0.92em;
+        }
+
+        .date-selector {
+            background: #32383a;
+            border-bottom: none;
+            padding: 0 30px 20px;
+        }
+
+        .date-selector > div {
+            justify-content: flex-end !important;
+        }
+
+        .legacy-date-control {
+            display: none;
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .header {
+                padding: 22px 16px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .calendar-shell,
+            .selected-day-panel {
+                padding: 18px 14px 22px;
+            }
+
+            .date-selector {
+                padding: 0 14px 16px;
+            }
+
+            .calendar-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .calendar-toolbar h2 {
+                order: -1;
+                font-size: 1.25em;
+            }
+
+            .calendar-nav {
+                justify-content: center;
+            }
+
+            .calendar-weekdays,
+            .calendar-grid {
+                gap: 5px;
+            }
+
+            .calendar-day {
+                min-height: 72px;
+                padding: 7px;
+            }
+
+            .calendar-pill {
+                font-size: 0.68em;
+                padding: 3px 5px;
+            }
+
+            .selected-day-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .selected-day-title {
+                font-size: 1.35em;
+            }
+
+            .task-item {
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .task-actions {
+                width: 100%;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+            }
+
+            .duration-inputs {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 <body>
@@ -687,12 +951,15 @@
                 <button id="trash-view-btn" class="header-btn" onclick="showTrash()">🗑️ View Trash</button>
                 <button id="back-btn" class="header-btn" onclick="showMain()" style="display: none;">← Back to Main</button>
                 <button class="header-btn" onclick="exportBackup()">💾 Backup</button>
+                <button class="header-btn" onclick="openRestorePicker()">↩ Restore</button>
+                <button class="header-btn" onclick="exportIcs()">📅 Export ICS</button>
+                <input type="file" id="restore-input" class="restore-input" accept="application/json,.json" onchange="importBackup(event)">
             </div>
         </div>
 
         <div class="date-selector">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <div>
+                <div class="legacy-date-control">
                     <label for="task-date">📅 Select Date:</label>
                     <input type="date" id="task-date" min="2020-01-01" max="2080-12-31">
                 </div>
@@ -706,7 +973,38 @@
             </div>
         </div>
 
-        <div class="content">
+        <section id="calendar-shell" class="calendar-shell">
+            <div class="calendar-toolbar">
+                <div class="calendar-nav">
+                    <button class="calendar-btn" type="button" onclick="navigateMonth(-1)" aria-label="Previous month">‹</button>
+                    <button class="calendar-btn" type="button" onclick="goToToday()">Today</button>
+                </div>
+                <h2 id="calendar-month-label"></h2>
+                <div class="calendar-nav">
+                    <button class="calendar-btn" type="button" onclick="navigateMonth(1)" aria-label="Next month">›</button>
+                </div>
+            </div>
+            <div class="calendar-weekdays" aria-hidden="true">
+                <div class="calendar-weekday">Sun</div>
+                <div class="calendar-weekday">Mon</div>
+                <div class="calendar-weekday">Tue</div>
+                <div class="calendar-weekday">Wed</div>
+                <div class="calendar-weekday">Thu</div>
+                <div class="calendar-weekday">Fri</div>
+                <div class="calendar-weekday">Sat</div>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+        </section>
+
+        <div class="content selected-day-panel">
+            <div id="selected-day-header" class="selected-day-header">
+                <div>
+                    <div class="selected-day-kicker">Selected date</div>
+                    <div id="selected-day-title" class="selected-day-title"></div>
+                    <div id="selected-day-meta" class="selected-day-meta"></div>
+                </div>
+            </div>
+
             <div id="categories-container"></div>
 
             <div id="main-view" class="add-category-section">
@@ -772,11 +1070,10 @@
     <script>
         // Initialize with today's date
         const dateInput = document.getElementById('task-date');
-        // Get current date in Seattle/Pacific timezone
-        const today = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }).split(',')[0];
-        const [month, day, year] = today.split('/');
-        const seattleDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        dateInput.value = seattleDate;
+        const initialToday = new Date();
+        const initialDate = formatDateString(initialToday);
+        dateInput.value = initialDate;
+        let visibleMonthDate = new Date(initialToday.getFullYear(), initialToday.getMonth(), 1);
 
         // Data structures
         let checklistData = {};
@@ -798,6 +1095,28 @@
         // View state
         let currentView = 'main'; // 'main' or 'trash'
 
+        function padNumber(value) {
+            return String(value).padStart(2, '0');
+        }
+
+        function formatDateString(date) {
+            return `${date.getFullYear()}-${padNumber(date.getMonth() + 1)}-${padNumber(date.getDate())}`;
+        }
+
+        function parseDateString(dateStr) {
+            const [yearValue, monthValue, dayValue] = dateStr.split('-').map(Number);
+            return new Date(yearValue, monthValue - 1, dayValue);
+        }
+
+        function formatDateForDisplay(dateStr) {
+            return parseDateString(dateStr).toLocaleDateString(undefined, {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
         // Load data from localStorage
         function loadData() {
             const saved = localStorage.getItem('checklistData');
@@ -816,6 +1135,16 @@
             if (savedSendToTrash !== null) {
                 sendToTrash = JSON.parse(savedSendToTrash);
             }
+            normalizeLoadedData();
+        }
+
+        function normalizeLoadedData() {
+            checklistData = checklistData && typeof checklistData === 'object' ? checklistData : {};
+            dailyTasks = dailyTasks && typeof dailyTasks === 'object' ? dailyTasks : {};
+            dailyTasks.independent = Array.isArray(dailyTasks.independent) ? dailyTasks.independent : [];
+            dailyTasks.shared = Array.isArray(dailyTasks.shared) ? dailyTasks.shared : [];
+            trash = Array.isArray(trash) ? trash : [];
+            sendToTrash = sendToTrash !== false;
         }
 
         // Save data to localStorage
@@ -829,6 +1158,65 @@
         // Get current date
         function getCurrentDate() {
             return dateInput.value;
+        }
+
+        function setCurrentDate(dateStr) {
+            dateInput.value = dateStr;
+            const selected = parseDateString(dateStr);
+            visibleMonthDate = new Date(selected.getFullYear(), selected.getMonth(), 1);
+        }
+
+        function getDateRecord(date) {
+            return checklistData[date] || null;
+        }
+
+        function getDatedTasksForDate(date) {
+            const record = getDateRecord(date);
+            if (!record || !Array.isArray(record.categories)) {
+                return [];
+            }
+
+            return record.categories.flatMap(category =>
+                (category.tasks || []).map(task => ({
+                    ...task,
+                    categoryId: category.id,
+                    categoryName: category.name,
+                    taskType: task.type || 'regular'
+                }))
+            );
+        }
+
+        function getAllTasksForDate(date) {
+            const record = getDateRecord(date);
+            const dailyCompletionStates = record?.dailyCompletionStates || {};
+            const independentTasks = (dailyTasks.independent || []).map(task => ({
+                ...task,
+                categoryName: 'Daily',
+                taskType: 'daily-independent',
+                completed: !!dailyCompletionStates[task.globalId]
+            }));
+            const sharedTasks = (dailyTasks.shared || []).map(task => ({
+                ...task,
+                categoryName: 'Daily',
+                taskType: 'daily-shared',
+                completed: false
+            }));
+
+            return [
+                ...independentTasks,
+                ...sharedTasks,
+                ...getDatedTasksForDate(date)
+            ];
+        }
+
+        function getReadOnlyDateSummary(date) {
+            const tasks = getAllTasksForDate(date);
+            const completed = tasks.filter(task => task.completed).length;
+            return {
+                total: tasks.length,
+                completed,
+                open: Math.max(tasks.length - completed, 0)
+            };
         }
 
         // Helper function to convert hex color to rgba with opacity
@@ -898,6 +1286,9 @@
             const category = checklistData[date].categories.find(cat => String(cat.id) === String(categoryId));
             if (category && category.isDefault) {
                 alert('Cannot delete the default Daily category!');
+                return;
+            }
+            if (category && !confirm(`Delete category "${category.name}" and its tasks for ${date}?`)) {
                 return;
             }
 
@@ -1072,9 +1463,23 @@
                 newTask.repeatType = repeatType;
 
                 const dates = getDatesWithRepeat(startDate, endDate, repeatType);
+                const sourceCategory = checklistData[date]?.categories.find(cat => String(cat.id) === String(categoryId));
                 dates.forEach(d => {
                     initDateData(d);
-                    const cat = checklistData[d].categories.find(cat => String(cat.id) === String(categoryId));
+                    let cat = checklistData[d].categories.find(cat => String(cat.id) === String(categoryId));
+                    if (!cat && sourceCategory) {
+                        cat = {
+                            id: sourceCategory.id,
+                            name: sourceCategory.name,
+                            isDefault: !!sourceCategory.isDefault,
+                            tasks: []
+                        };
+                        if (cat.isDefault) {
+                            checklistData[d].categories.unshift(cat);
+                        } else {
+                            checklistData[d].categories.push(cat);
+                        }
+                    }
                     if (cat) {
                         cat.tasks.push({ ...newTask });
                     }
@@ -1185,6 +1590,12 @@
         // Delete a task
         function deleteTask(categoryId, taskId, taskType, globalId) {
             const date = getCurrentDate();
+            const deleteMessage = taskType === 'duration'
+                ? 'Delete this duration task from every date in its range?'
+                : 'Delete this task?';
+            if (!confirm(deleteMessage)) {
+                return;
+            }
 
             if (taskType === 'daily-independent') {
                 dailyTasks.independent = dailyTasks.independent.filter(t => t.globalId !== globalId);
@@ -1628,6 +2039,102 @@
             }
         }
 
+        function selectCalendarDate(dateStr) {
+            setCurrentDate(dateStr);
+            currentView = 'main';
+            renderView();
+        }
+
+        function navigateMonth(delta) {
+            visibleMonthDate = new Date(
+                visibleMonthDate.getFullYear(),
+                visibleMonthDate.getMonth() + delta,
+                1
+            );
+            renderCalendar();
+        }
+
+        function goToToday() {
+            const todayDate = formatDateString(new Date());
+            selectCalendarDate(todayDate);
+        }
+
+        function updateSelectedDayHeader() {
+            const date = getCurrentDate();
+            const title = document.getElementById('selected-day-title');
+            const meta = document.getElementById('selected-day-meta');
+            if (!title || !meta) return;
+
+            const summary = getReadOnlyDateSummary(date);
+            title.textContent = formatDateForDisplay(date);
+            meta.textContent = `${summary.total} task${summary.total === 1 ? '' : 's'} · ${summary.completed} done · ${summary.open} open`;
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const label = document.getElementById('calendar-month-label');
+            if (!grid || !label) return;
+
+            const year = visibleMonthDate.getFullYear();
+            const month = visibleMonthDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const startOffset = firstDay.getDay();
+            const gridStart = new Date(year, month, 1 - startOffset);
+            const selectedDate = getCurrentDate();
+            const todayDate = formatDateString(new Date());
+
+            label.textContent = firstDay.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'long'
+            });
+
+            grid.innerHTML = '';
+
+            for (let index = 0; index < 42; index++) {
+                const cellDate = new Date(
+                    gridStart.getFullYear(),
+                    gridStart.getMonth(),
+                    gridStart.getDate() + index
+                );
+                const dateStr = formatDateString(cellDate);
+                const summary = getReadOnlyDateSummary(dateStr);
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'calendar-day';
+                button.setAttribute('aria-label', formatDateForDisplay(dateStr));
+                button.onclick = () => selectCalendarDate(dateStr);
+
+                if (cellDate.getMonth() !== month) {
+                    button.classList.add('outside-month');
+                }
+                if (dateStr === todayDate) {
+                    button.classList.add('today');
+                }
+                if (dateStr === selectedDate) {
+                    button.classList.add('selected');
+                    button.setAttribute('aria-current', 'date');
+                }
+                if (summary.total > 0) {
+                    button.classList.add('has-tasks');
+                }
+
+                const countText = summary.total > 0
+                    ? `<span class="calendar-pill">${summary.total}</span>`
+                    : '';
+                const doneText = summary.completed > 0
+                    ? `<span class="calendar-pill done">${summary.completed} done</span>`
+                    : '';
+
+                button.innerHTML = `
+                    <span class="calendar-day-number">${cellDate.getDate()}</span>
+                    <span class="calendar-day-summary">${countText}${doneText}</span>
+                `;
+                grid.appendChild(button);
+            }
+
+            updateSelectedDayHeader();
+        }
+
         // Trash functions
         function toggleTrashMode() {
             sendToTrash = !sendToTrash;
@@ -1658,6 +2165,9 @@
         }
 
         function deleteFromTrash(globalId) {
+            if (!confirm('Permanently delete this trash item?')) {
+                return;
+            }
             trash = trash.filter(t => t.globalId !== globalId);
             saveData();
             renderView();
@@ -1671,25 +2181,182 @@
             }
         }
 
-        // Backup function
-        function exportBackup() {
-            const data = {
+        function getBackupPayload() {
+            return {
                 checklistData: checklistData,
                 dailyTasks: dailyTasks,
                 trash: trash,
                 sendToTrash: sendToTrash,
                 exportDate: new Date().toISOString()
             };
+        }
 
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        function downloadTextFile(content, filename, mimeType) {
+            const dataBlob = new Blob([content], {type: mimeType});
             const url = URL.createObjectURL(dataBlob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'checklist-backup-' + new Date().toISOString().split('T')[0] + '.json';
+            link.download = filename;
             link.click();
             URL.revokeObjectURL(url);
+        }
+
+        function downloadBackup(prefix = 'checklist-backup') {
+            const dataStr = JSON.stringify(getBackupPayload(), null, 2);
+            const filename = `${prefix}-${new Date().toISOString().split('T')[0]}.json`;
+            downloadTextFile(dataStr, filename, 'application/json');
+        }
+
+        // Backup function
+        function exportBackup() {
+            downloadBackup();
             alert('Backup downloaded successfully!');
+        }
+
+        function openRestorePicker() {
+            const restoreInput = document.getElementById('restore-input');
+            if (restoreInput) {
+                restoreInput.value = '';
+                restoreInput.click();
+            }
+        }
+
+        function validateBackupData(data) {
+            return data
+                && typeof data === 'object'
+                && data.checklistData
+                && typeof data.checklistData === 'object'
+                && data.dailyTasks
+                && Array.isArray(data.dailyTasks.independent)
+                && Array.isArray(data.dailyTasks.shared)
+                && Array.isArray(data.trash)
+                && typeof data.sendToTrash === 'boolean';
+        }
+
+        function importBackup(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const importedData = JSON.parse(reader.result);
+                    if (!validateBackupData(importedData)) {
+                        alert('This backup file does not match the expected checklist backup format.');
+                        return;
+                    }
+
+                    const confirmed = confirm('Restore this backup? Your current data will be downloaded first, then replaced with the imported backup.');
+                    if (!confirmed) return;
+
+                    downloadBackup('checklist-pre-restore-backup');
+                    checklistData = importedData.checklistData || {};
+                    dailyTasks = importedData.dailyTasks || { independent: [], shared: [] };
+                    trash = importedData.trash || [];
+                    sendToTrash = importedData.sendToTrash;
+                    saveData();
+                    currentView = 'main';
+                    renderView();
+                    alert('Backup restored successfully.');
+                } catch (error) {
+                    alert('Could not restore backup: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function escapeIcsText(value) {
+            return String(value || '')
+                .replace(/\\/g, '\\\\')
+                .replace(/\n/g, '\\n')
+                .replace(/\r/g, '')
+                .replace(/,/g, '\\,')
+                .replace(/;/g, '\\;');
+        }
+
+        function dateToIcsDate(dateStr) {
+            return dateStr.replaceAll('-', '');
+        }
+
+        function addDays(dateStr, amount) {
+            const date = parseDateString(dateStr);
+            date.setDate(date.getDate() + amount);
+            return formatDateString(date);
+        }
+
+        function getDatesBetween(startDate, endDate) {
+            const dates = [];
+            const current = parseDateString(startDate);
+            const end = parseDateString(endDate);
+            while (current <= end) {
+                dates.push(formatDateString(current));
+                current.setDate(current.getDate() + 1);
+            }
+            return dates;
+        }
+
+        function getVisibleMonthRange() {
+            const year = visibleMonthDate.getFullYear();
+            const month = visibleMonthDate.getMonth();
+            return {
+                start: formatDateString(new Date(year, month, 1)),
+                end: formatDateString(new Date(year, month + 1, 0))
+            };
+        }
+
+        function createIcsEvent(task, date, index) {
+            const timestamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+            const taskId = task.globalId || task.id || index;
+            const uid = `${date}-${taskId}-${index}@daily-checklist.local`;
+            const status = task.completed ? 'Completed' : 'Open';
+            const descriptionParts = [
+                `Type: ${task.taskType || task.type || 'regular'}`,
+                `Category: ${task.categoryName || 'Daily'}`,
+                `Status: ${status}`
+            ];
+            if (task.description) {
+                descriptionParts.push('', task.description);
+            }
+
+            return [
+                'BEGIN:VEVENT',
+                `UID:${escapeIcsText(uid)}`,
+                `DTSTAMP:${timestamp}`,
+                `DTSTART;VALUE=DATE:${dateToIcsDate(date)}`,
+                `DTEND;VALUE=DATE:${dateToIcsDate(addDays(date, 1))}`,
+                `SUMMARY:${escapeIcsText(task.text || 'Checklist task')}`,
+                `DESCRIPTION:${escapeIcsText(descriptionParts.join('\n'))}`,
+                'END:VEVENT'
+            ].join('\r\n');
+        }
+
+        function exportIcs() {
+            const exportMonth = confirm('Export the current visible month? Choose Cancel to export only the selected date.');
+            const range = exportMonth ? getVisibleMonthRange() : { start: getCurrentDate(), end: getCurrentDate() };
+            const dates = getDatesBetween(range.start, range.end);
+            const events = [];
+
+            dates.forEach(date => {
+                getAllTasksForDate(date).forEach((task, index) => {
+                    events.push(createIcsEvent(task, date, index));
+                });
+            });
+
+            if (events.length === 0) {
+                alert('No tasks found for the selected ICS export range.');
+                return;
+            }
+
+            const calendar = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//Daily Checklist//Calendar Export//EN',
+                'CALSCALE:GREGORIAN',
+                ...events,
+                'END:VCALENDAR'
+            ].join('\r\n');
+            const suffix = exportMonth ? `${range.start}-to-${range.end}` : getCurrentDate();
+            downloadTextFile(calendar, `daily-checklist-${suffix}.ics`, 'text/calendar');
         }
 
         function renderTrashView() {
@@ -1758,16 +2425,24 @@
                 trashCheckbox.checked = sendToTrash;
             }
 
+            const calendarShell = document.getElementById('calendar-shell');
+            const selectedDayHeader = document.getElementById('selected-day-header');
+
             if (currentView === 'trash') {
+                if (calendarShell) calendarShell.style.display = 'none';
+                if (selectedDayHeader) selectedDayHeader.style.display = 'none';
                 document.getElementById('main-view').style.display = 'none';
                 document.getElementById('trash-view-btn').style.display = 'none';
                 document.getElementById('back-btn').style.display = 'inline-block';
                 renderTrashView();
             } else {
+                if (calendarShell) calendarShell.style.display = 'block';
+                if (selectedDayHeader) selectedDayHeader.style.display = 'flex';
                 document.getElementById('main-view').style.display = 'block';
                 document.getElementById('trash-view-btn').style.display = 'inline-block';
                 document.getElementById('back-btn').style.display = 'none';
                 renderCategories();
+                renderCalendar();
             }
         }
 
@@ -1813,7 +2488,7 @@
                 const deleteButton = isDaily ? '' : `<button class="delete-category-btn" onclick="deleteCategory('${category.id}')">🗑️ Delete</button>`;
                 const dailyBadge = isDaily ? '<span class="daily-category-badge">⭐ Default</span>' : '';
                 const nameInput = isDaily ?
-                    `<span style="font-size: 1em; font-weight: 600; color: #495057; padding: 5px;">${category.name}</span>` :
+                    `<span style="font-size: 1em; font-weight: 600; color: #e5e5e5; padding: 5px;">${category.name}</span>` :
                     `<input type="text" value="${category.name}" onchange="updateCategoryName('${category.id}', this.value)" placeholder="Category name">`;
 
                 // Different task type options for Daily category vs regular categories
@@ -2042,6 +2717,8 @@
         // Event listener for date change
         dateInput.addEventListener('change', () => {
             if (currentView === 'main') {
+                const selected = parseDateString(getCurrentDate());
+                visibleMonthDate = new Date(selected.getFullYear(), selected.getMonth(), 1);
                 renderView();
             }
         });
@@ -2058,6 +2735,14 @@
                 closeTaskDetailModal();
             }
         });
+
+        if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').catch(error => {
+                    console.warn('Service worker registration failed:', error);
+                });
+            });
+        }
 
         // Initialize app
         loadData();
